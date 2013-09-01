@@ -81,9 +81,8 @@ final class PropertyDescriptorCacheLoader extends CacheLoader<Class<?>, ArrayLis
 
     @Override
     public ArrayList<PropertyDescriptor> load (final Class<?> key) throws Exception {
-        final PropertyDescriptor[] descriptors = getPropertyDescriptors (key);
-        final ArrayList<PropertyDescriptor> descriptorList = Lists.newArrayListWithExpectedSize (descriptors.length);
-        descriptorList.addAll (Arrays.asList (descriptors));
+        final ArrayList<PropertyDescriptor> descriptorList = Lists.newArrayList ();
+        descriptorList.addAll (Arrays.asList (getPropertyDescriptors (key)));
         return descriptorList;
     }
 
