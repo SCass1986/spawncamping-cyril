@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class GuavaCache {
-    private LoadingCache<String, PropertyDescriptor> propertyCache;
+    private final LoadingCache<String, PropertyDescriptor> propertyCache;
 
     public GuavaCache () {
         this.propertyCache = CacheBuilder.newBuilder ()
