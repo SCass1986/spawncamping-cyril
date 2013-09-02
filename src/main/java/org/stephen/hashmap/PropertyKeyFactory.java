@@ -1,26 +1,10 @@
 package org.stephen.hashmap;
 
-import com.google.common.collect.Maps;
-
-import java.util.Map;
-
 public enum PropertyKeyFactory {
     INSTANCE;
 
-    private final Map<String, PropertyKey> lookUp = Maps.newHashMapWithExpectedSize (100);
-
     public PropertyKey getKey (final String key) {
-        return getPropertyKey (key);
-    }
-
-    private PropertyKey getPropertyKey (final String key) {
-        PropertyKey propertyKey = lookUp.get (key);
-        if (propertyKey != null) {
-            return propertyKey;
-        }
-        propertyKey = new PropertyKey (key);
-        lookUp.put (key, propertyKey);
-        return propertyKey;
+        return new PropertyKey (key.intern ());
     }
 
     public static final class PropertyKey {

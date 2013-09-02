@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class Main {
+public final class Main {
 
     public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
         final GuavaCache cache = new GuavaCache ();
         List<String> propertyList = getPropertyList ();
 
-        for (int i = 0; i < 1001; ++i) {
+        long startTime, endTime;
+        for (int i = 0; i < 1000000001; ++i) {
             for (String property : propertyList) {
-                final long startTime = System.nanoTime ();
+                startTime = System.nanoTime ();
                 cache.get (property);
-                final long endTime = System.nanoTime () - startTime;
+                endTime = System.nanoTime () - startTime;
 
                 if (i % 10 == 0) {
                     final String times = String.format ("%01$,.4f ms, %2$,.6f sec", (endTime / 1000000.0), endTime / 1000000000.0);

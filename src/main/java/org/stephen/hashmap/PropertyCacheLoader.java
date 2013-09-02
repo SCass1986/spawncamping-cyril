@@ -44,7 +44,7 @@ public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.Pr
     }
 
     private PropertyHolder createPropertyHolder (final PropertyDescriptor propertyDescriptor) {
-        return new PropertyHolder.Builder (propertyDescriptor.getName ())
+        return new PropertyHolder.Builder (propertyDescriptor.getName (), propertyDescriptor.getClass ().getName ())
                 .withReadMethod (propertyDescriptor.getReadMethod ())
                 .withWriteMethod (propertyDescriptor.getWriteMethod ())
                 .build ();
