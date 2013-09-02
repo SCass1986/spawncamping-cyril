@@ -3,46 +3,39 @@ package org.stephen.hashmap;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public final class PropertyCacheLoader extends CacheLoader<String, PropertyHolder> {
+import static org.stephen.hashmap.GuavaCache.PropertyHolder;
+
+public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.PropertyKey, PropertyHolder> {
     private static final String KEY_SPLIT_TOKEN = ".";
 
-    private final LoadingCache<Class<?>, ArrayList<PropertyDescriptor>> propertyDescriptorCache;
+    private final LoadingCache<Class<?>, PropertyDescriptor[]> propertyDescriptorCache;
 
     public PropertyCacheLoader () {
         this.propertyDescriptorCache = CacheBuilder.newBuilder ()
-                                                   .maximumSize (10)
+                                                   .maximumSize (100)
+                                                   .concurrencyLevel (1)
                                                    .expireAfterAccess (10, TimeUnit.MINUTES)
                                                    .build (new PropertyDescriptorCacheLoader ());
     }
 
     @Override
-    public PropertyHolder load (final String property) throws Exception {
-        return getProperty (property);  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    private PropertyHolder getProperty (final String property) throws IntrospectionException, ExecutionException, ClassNotFoundException {
-        final String propertyFromKeyString = getPropertyFromKeyString (property);
-        final Class<?> classFromKeyString = getClassFromKeyString (property);
-        final List<PropertyDescriptor> propertyDescriptors = propertyDescriptorCache.get (classFromKeyString);
+    public PropertyHolder load (final PropertyKeyFactory.PropertyKey property) throws Exception {
+        final String propertyFromKeyString = getPropertyFromKeyString (property.getKey ());
+        final Class<?> classFromKeyString = getClassFromKeyString (property.getKey ());
+        final PropertyDescriptor[] propertyDescriptors = propertyDescriptorCache.get (classFromKeyString);
         final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (propertyDescriptors, propertyFromKeyString);
         return createPropertyHolder (descriptor);
     }
 
-    private PropertyDescriptor getPropertyFromPropertyDescriptorList (final List<PropertyDescriptor> propertyDescriptors, final String property) {
-
+    private PropertyDescriptor getPropertyFromPropertyDescriptorList (final PropertyDescriptor[] propertyDescriptors, final String property) {
         for (final PropertyDescriptor prop : propertyDescriptors) {
             if (StringUtils.equals (prop.getName (), property)) {
                 return prop;
@@ -68,14 +61,11 @@ public final class PropertyCacheLoader extends CacheLoader<String, PropertyHolde
         return StringUtils.substring (key, splitIndex + 1);
     }
 
-    static final class PropertyDescriptorCacheLoader extends CacheLoader<Class<?>, ArrayList<PropertyDescriptor>> {
+    static final class PropertyDescriptorCacheLoader extends CacheLoader<Class<?>, PropertyDescriptor[]> {
 
         @Override
-        public ArrayList<PropertyDescriptor> load (final Class<?> key) throws Exception {
-            final PropertyDescriptor[] descriptors = getPropertyDescriptors (key);
-            final ArrayList<PropertyDescriptor> descriptorList = Lists.newArrayListWithExpectedSize (descriptors.length);
-            descriptorList.addAll (Arrays.asList (descriptors));
-            return descriptorList;
+        public PropertyDescriptor[] load (final Class<?> key) throws Exception {
+            return getPropertyDescriptors (key);
         }
 
         private PropertyDescriptor[] getPropertyDescriptors (final Class<?> clazz) throws IntrospectionException {

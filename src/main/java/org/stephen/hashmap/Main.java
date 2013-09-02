@@ -1,5 +1,6 @@
 package org.stephen.hashmap;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -13,15 +14,17 @@ import java.util.concurrent.ExecutionException;
  */
 public class Main {
 
-    public static void main (String[] args) throws ExecutionException {
+    public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
         final GuavaCache cache = new GuavaCache ();
         List<String> propertyList = getPropertyList ();
-        for (int i = 0; i < 101; ++i) {
+        CacheObject object = new CacheObject ("testString", 1000000, 56789.877);
+        for (int i = 0; i < 1001; ++i) {
             for (String property : propertyList) {
                 final long startTime = System.nanoTime ();
                 cache.get (property);
+                final long endTime = System.nanoTime () - startTime;
+
                 if (i % 10 == 0) {
-                    final long endTime = System.nanoTime () - startTime;
                     final String times = String.format ("%01$,.4f ms, %2$,.6f sec", (endTime / 1000000.0), endTime / 1000000000.0);
                     System.out.println (String.format ("[%03d] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)", i, property, " ", endTime, times));
                 }
