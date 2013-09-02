@@ -7,21 +7,20 @@ import java.util.Map;
 public enum PropertyKeyFactory {
     INSTANCE;
 
-    private final Map<String, PropertyKey> lookUp = Maps.newHashMap ();
+    private final Map<String, PropertyKey> lookUp = Maps.newHashMapWithExpectedSize (100);
 
     public PropertyKey getKey (final String key) {
-        return getKeyFromLookUp (key);
+        return getPropertyKey (key);
     }
 
-    private PropertyKey getKeyFromLookUp (final String key) {
-        final PropertyKey propertyKey = lookUp.get (key);
+    private PropertyKey getPropertyKey (final String key) {
+        PropertyKey propertyKey = lookUp.get (key);
         if (propertyKey != null) {
             return propertyKey;
         }
-
-        final PropertyKey newPropertyKey = new PropertyKey (key);
-        lookUp.put (key, newPropertyKey);
-        return newPropertyKey;
+        propertyKey = new PropertyKey (key);
+        lookUp.put (key, propertyKey);
+        return propertyKey;
     }
 
     public static final class PropertyKey {
@@ -49,12 +48,8 @@ public enum PropertyKeyFactory {
         @Override
         public boolean equals (Object o) {
             if (this == o) { return true; }
-            if (o == null || getClass () != o.getClass ()) { return false; }
-
             PropertyKey that = (PropertyKey) o;
-
             if (!key.equals (that.key)) { return false; }
-
             return true;
         }
     }

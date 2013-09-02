@@ -5,19 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created with IntelliJ IDEA.
- * User: stephen
- * Date: 01/09/13
- * Time: 15:17
- * To change this template use File | Settings | File Templates.
- */
 public class Main {
 
     public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
         final GuavaCache cache = new GuavaCache ();
         List<String> propertyList = getPropertyList ();
-        CacheObject object = new CacheObject ("testString", 1000000, 56789.877);
+
         for (int i = 0; i < 1001; ++i) {
             for (String property : propertyList) {
                 final long startTime = System.nanoTime ();
@@ -35,9 +28,18 @@ public class Main {
 
     private static List<String> getPropertyList () {
         List<String> propertyList = new ArrayList<> (3);
-        propertyList.add (String.format ("%s.stringValue", CacheObject.class.getName ()));
-        propertyList.add (String.format ("%s.doubleValue", CacheObject.class.getName ()));
-        propertyList.add (String.format ("%s.longValue", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.stringValue_01", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.stringValue_02", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.stringValue_03", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.stringValue_04", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.doubleValue_01", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.doubleValue_02", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.doubleValue_03", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.doubleValue_04", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.longValue_01", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.longValue_02", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.longValue_03", CacheObject.class.getName ()));
+        propertyList.add (String.format ("%s.longValue_04", CacheObject.class.getName ()));
         return propertyList;
     }
 

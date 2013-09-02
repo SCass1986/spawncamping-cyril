@@ -6,9 +6,9 @@ import com.google.common.cache.LoadingCache;
 import org.apache.commons.lang3.StringUtils;
 
 import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.stephen.hashmap.GuavaCache.PropertyHolder;
@@ -28,14 +28,13 @@ public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.Pr
 
     @Override
     public PropertyHolder load (final PropertyKeyFactory.PropertyKey property) throws Exception {
-        final String propertyFromKeyString = getPropertyFromKeyString (property.getKey ());
-        final Class<?> classFromKeyString = getClassFromKeyString (property.getKey ());
-        final PropertyDescriptor[] propertyDescriptors = propertyDescriptorCache.get (classFromKeyString);
-        final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (propertyDescriptors, propertyFromKeyString);
+        final String propertyKey = property.getKey ();
+        final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (getPropertyFromKeyString (propertyKey), getClassFromKeyString (propertyKey));
         return createPropertyHolder (descriptor);
     }
 
-    private PropertyDescriptor getPropertyFromPropertyDescriptorList (final PropertyDescriptor[] propertyDescriptors, final String property) {
+    private PropertyDescriptor getPropertyFromPropertyDescriptorList (final String property, final Class<?> clazz) throws ExecutionException {
+        final PropertyDescriptor[] propertyDescriptors = propertyDescriptorCache.get (clazz);
         for (final PropertyDescriptor prop : propertyDescriptors) {
             if (StringUtils.equals (prop.getName (), property)) {
                 return prop;
@@ -65,13 +64,8 @@ public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.Pr
 
         @Override
         public PropertyDescriptor[] load (final Class<?> key) throws Exception {
-            return getPropertyDescriptors (key);
-        }
-
-        private PropertyDescriptor[] getPropertyDescriptors (final Class<?> clazz) throws IntrospectionException {
-            BeanInfo classInfo = Introspector.getBeanInfo (clazz, Object.class);
+            BeanInfo classInfo = Introspector.getBeanInfo (key, Object.class);
             return classInfo.getPropertyDescriptors ();
         }
     }
-
 }
