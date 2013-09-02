@@ -48,9 +48,9 @@ public enum PropertyKeyFactory {
         @Override
         public boolean equals (Object o) {
             if (this == o) { return true; }
+            if (!(o instanceof PropertyKey)) { return false; }
             PropertyKey that = (PropertyKey) o;
-            if (!key.equals (that.key)) { return false; }
-            return true;
+            return key.equals (that.key);
         }
     }
 }
