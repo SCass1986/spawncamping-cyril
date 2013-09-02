@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public final class PropertyCacheLoader extends CacheLoader<String, PropertyDescriptor> {
+public final class PropertyCacheLoader extends CacheLoader<String, PropertyHolder> {
     private static final String KEY_SPLIT_TOKEN = ".";
 
     private final LoadingCache<Class<?>, ArrayList<PropertyDescriptor>> propertyDescriptorCache;
@@ -29,15 +29,16 @@ public final class PropertyCacheLoader extends CacheLoader<String, PropertyDescr
     }
 
     @Override
-    public PropertyDescriptor load (final String property) throws Exception {
+    public PropertyHolder load (final String property) throws Exception {
         return getProperty (property);  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private PropertyDescriptor getProperty (final String property) throws IntrospectionException, ExecutionException, ClassNotFoundException {
+    private PropertyHolder getProperty (final String property) throws IntrospectionException, ExecutionException, ClassNotFoundException {
         final String propertyFromKeyString = getPropertyFromKeyString (property);
         final Class<?> classFromKeyString = getClassFromKeyString (property);
         final List<PropertyDescriptor> propertyDescriptors = propertyDescriptorCache.get (classFromKeyString);
-        return getPropertyFromPropertyDescriptorList (propertyDescriptors, propertyFromKeyString);
+        final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (propertyDescriptors, propertyFromKeyString);
+        return createPropertyHolder (descriptor);
     }
 
     private PropertyDescriptor getPropertyFromPropertyDescriptorList (final List<PropertyDescriptor> propertyDescriptors, final String property) {
@@ -48,6 +49,13 @@ public final class PropertyCacheLoader extends CacheLoader<String, PropertyDescr
             }
         }
         return null;
+    }
+
+    private PropertyHolder createPropertyHolder (final PropertyDescriptor propertyDescriptor) {
+        return new PropertyHolder.Builder (propertyDescriptor.getName ())
+                .withReadMethod (propertyDescriptor.getReadMethod ())
+                .withWriteMethod (propertyDescriptor.getWriteMethod ())
+                .build ();
     }
 
     private Class<?> getClassFromKeyString (final String key) throws ClassNotFoundException {
