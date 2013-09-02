@@ -6,8 +6,11 @@ import com.google.common.cache.LoadingCache;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
+import static org.stephen.hashmap.PropertyKeyFactory.PropertyKey;
+
+
 public final class GuavaCache {
-    private final LoadingCache<PropertyKeyFactory.PropertyKey, PropertyHolder> propertyCache;
+    private final LoadingCache<PropertyKey, PropertyHolder> propertyCache;
 
     public GuavaCache () {
         this.propertyCache = CacheBuilder.newBuilder ()
