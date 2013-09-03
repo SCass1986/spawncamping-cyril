@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.stephen.hashmap.GuavaCache.PropertyHolder;
 
-public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.PropertyKey, PropertyHolder> {
+public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.PropertyKey, AbstractPropertyCache.PropertyHolder> {
     private static final String KEY_SPLIT_TOKEN = ".";
 
     private final LoadingCache<Class<?>, PropertyDescriptor[]> propertyDescriptorCache;

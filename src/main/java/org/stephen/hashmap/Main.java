@@ -12,7 +12,7 @@ public final class Main {
         List<String> propertyList = getPropertyList ();
 
         long startTime, endTime;
-        for (int i = 0; i < 1000000001; ++i) {
+        for (int i = 0; i < 1001; ++i) {
             for (String property : propertyList) {
                 startTime = System.nanoTime ();
                 cache.get (property);
