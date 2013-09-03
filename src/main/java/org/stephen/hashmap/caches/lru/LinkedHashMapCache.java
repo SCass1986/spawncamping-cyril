@@ -1,51 +1,85 @@
-package org.stephen.hashmap;
+package org.stephen.hashmap.caches.lru;
 
 import org.apache.commons.lang3.StringUtils;
+import org.stephen.hashmap.PropertyDescriptorCache;
+import org.stephen.hashmap.PropertyDescriptorUtils;
+import org.stephen.hashmap.caches.AbstractPropertyCache;
+import org.stephen.hashmap.caches.lru.eviction.EvictionStrategy;
+import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.stephen.hashmap.PropertyKeyFactory.PropertyKey;
+import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
 
 public final class LinkedHashMapCache extends AbstractPropertyCache<String> {
-    private final HashMapCache cache = new HashMapCache ();
+    private static final int     INITIAL_CAPACITY = 16;
+    private static final float   LOAD_FACTOR      = 0.75f;
+    private static final boolean ACCESS_ORDER     = true;
 
-    public LinkedHashMapCache (final EvictionStrategy evictionStrategy) {
-        evictionStrategy.setLinkedHashMap (cache);
-        this.cache.setEvictionStrategy (evictionStrategy);
+    private final HashMapCache cache;
+
+    protected LinkedHashMapCache (final Builder builder) {
+        this.cache = new HashMapCache (builder.initialCapactity, builder.loadFactor, builder.accessOrder, builder.evictionStrategy);
     }
 
-    public LinkedHashMapCache () {
-        this (new EvictBySize (5));
+    public static final class Builder {
+        private int              initialCapactity;
+        private float            loadFactor;
+        private boolean          accessOrder;
+        private EvictionStrategy evictionStrategy;
+
+        public Builder () {
+        }
+
+        public Builder withInitialCapacity (final int initialCapacity) {
+            this.initialCapactity = initialCapacity;
+            return this;
+        }
+
+        public Builder withLoadFactor (final float loadFactor) {
+            this.loadFactor = loadFactor;
+            return this;
+        }
+
+        public Builder withAccessOrder (final boolean accessOrder) {
+            this.accessOrder = accessOrder;
+            return this;
+        }
+
+        public Builder withEvictionStrategy (final EvictionStrategy evictionStrategy) {
+            this.evictionStrategy = evictionStrategy;
+            return this;
+        }
+
+        public LinkedHashMapCache build () {
+            return new LinkedHashMapCache (this);
+        }
     }
 
     @Override
-    public PropertyHolder get (final String property) {
-        return cache.get (PropertyKeyFactory.INSTANCE.getKey (property.intern ()));  //To change body of implemented methods use File | Settings | File Templates.
+    public PropertyHolder get (final String key) {
+        return cache.get (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private static final class HashMapCache extends LinkedHashMap<PropertyKey, PropertyHolder> {
-        private static final int     INITIAL_CAPACITY = 16;
-        private static final float   LOAD_FACTOR      = 0.75f;
-        private static final boolean ACCESS_ORDER     = true;
 
         private final PropertyDescriptorCache propertyDescriptorCache;
         private final PropertyDescriptorUtils util = new PropertyDescriptorUtils ();
         private EvictionStrategy<PropertyKey, PropertyHolder> evictionStrategy;
 
-        public HashMapCache (final int initialCapacity, final float loadFactor, final boolean accessOrder) {
+        public HashMapCache (final int initialCapacity, final float loadFactor, final boolean accessOrder, final EvictionStrategy evictionStrategy) {
             super (initialCapacity, loadFactor, accessOrder);
+            setEvictionStrategy (evictionStrategy);
             this.propertyDescriptorCache = new PropertyDescriptorCache ();
-        }
-
-        public HashMapCache () {
-            this (INITIAL_CAPACITY, LOAD_FACTOR, ACCESS_ORDER);
         }
 
         public void setEvictionStrategy (final EvictionStrategy evictionStrategy) {
             this.evictionStrategy = evictionStrategy;
+            this.evictionStrategy.setLinkedHashMap (this);
         }
 
         @Override

@@ -1,14 +1,16 @@
-package org.stephen.hashmap;
+package org.stephen.hashmap.caches.guava;
 
 import com.google.common.cache.CacheLoader;
 import org.apache.commons.lang3.StringUtils;
+import org.stephen.hashmap.PropertyDescriptorCache;
+import org.stephen.hashmap.PropertyDescriptorUtils;
+import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
 import java.beans.PropertyDescriptor;
 import java.util.concurrent.ExecutionException;
 
-import static org.stephen.hashmap.GuavaCache.PropertyHolder;
-
-public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.PropertyKey, AbstractPropertyCache.PropertyHolder> {
+public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.PropertyKey, PropertyHolder> {
     private final PropertyDescriptorCache propertyDescriptorCache;
     private final PropertyDescriptorUtils util = new PropertyDescriptorUtils ();
 
@@ -18,8 +20,8 @@ public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.Pr
     }
 
     @Override
-    public PropertyHolder load (final PropertyKeyFactory.PropertyKey property) throws Exception {
-        final String propertyKey = property.getKey ();
+    public PropertyHolder load (final PropertyKeyFactory.PropertyKey key) throws Exception {
+        final String propertyKey = key.getKey ();
         final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (util.getPropertyFromKeyString (propertyKey),
                                                                                      util.getClassFromKeyString (propertyKey));
         return util.createPropertyHolder (descriptor);

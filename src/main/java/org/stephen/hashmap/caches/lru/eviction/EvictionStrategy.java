@@ -1,4 +1,4 @@
-package org.stephen.hashmap;
+package org.stephen.hashmap.caches.lru.eviction;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

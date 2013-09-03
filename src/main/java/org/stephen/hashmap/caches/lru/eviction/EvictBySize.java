@@ -1,9 +1,12 @@
-package org.stephen.hashmap;
+package org.stephen.hashmap.caches.lru.eviction;
+
+import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class EvictBySize implements EvictionStrategy<PropertyKeyFactory.PropertyKey, AbstractPropertyCache.PropertyHolder> {
+public final class EvictBySize implements EvictionStrategy<PropertyKeyFactory.PropertyKey, PropertyHolder> {
     private final int           maxSize;
     private       LinkedHashMap map;
 
@@ -17,7 +20,7 @@ public final class EvictBySize implements EvictionStrategy<PropertyKeyFactory.Pr
     }
 
     @Override
-    public boolean evictEntry (final Map.Entry<PropertyKeyFactory.PropertyKey, AbstractPropertyCache.PropertyHolder> entry) {
+    public boolean evictEntry (final Map.Entry<PropertyKeyFactory.PropertyKey, PropertyHolder> entry) {
         return map.size () >= maxSize;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

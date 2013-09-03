@@ -1,11 +1,14 @@
-package org.stephen.hashmap;
+package org.stephen.hashmap.caches.guava;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
+import org.stephen.hashmap.caches.AbstractPropertyCache;
+import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.stephen.hashmap.PropertyKeyFactory.PropertyKey;
+import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
 
 
 public final class GuavaCache extends AbstractPropertyCache<String> {
@@ -21,7 +24,7 @@ public final class GuavaCache extends AbstractPropertyCache<String> {
     }
 
     @Override
-    public PropertyHolder get (final String property) {
-        return propertyCache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (property.intern ()));
+    public PropertyHolder get (final String key) {
+        return propertyCache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));
     }
 }

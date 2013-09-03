@@ -1,4 +1,4 @@
-package org.stephen.hashmap;
+package org.stephen.hashmap.caches.property;
 
 public enum PropertyKeyFactory {
     INSTANCE;

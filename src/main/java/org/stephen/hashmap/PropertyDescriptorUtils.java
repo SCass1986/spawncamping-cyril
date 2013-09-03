@@ -1,19 +1,18 @@
 package org.stephen.hashmap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.stephen.hashmap.caches.property.PropertyHolder;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 
-import static org.stephen.hashmap.AbstractPropertyCache.PropertyHolder;
-
 public final class PropertyDescriptorUtils {
     private static final String KEY_SPLIT_TOKEN = ".";
 
     public PropertyHolder createPropertyHolder (final PropertyDescriptor propertyDescriptor) {
-        return new AbstractPropertyCache.PropertyHolder.Builder (propertyDescriptor.getName (), propertyDescriptor.getClass ().getName ())
+        return new PropertyHolder.Builder (propertyDescriptor.getName (), propertyDescriptor.getClass ().getName ())
                 .withReadMethod (propertyDescriptor.getReadMethod ())
                 .withWriteMethod (propertyDescriptor.getWriteMethod ())
                 .build ();

@@ -3,6 +3,7 @@ package org.stephen.hashmap;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.stephen.hashmap.caches.Cache;
 
 import java.beans.PropertyDescriptor;
 import java.util.concurrent.TimeUnit;
