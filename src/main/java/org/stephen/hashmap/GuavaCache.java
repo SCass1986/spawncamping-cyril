@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import static org.stephen.hashmap.PropertyKeyFactory.PropertyKey;
 
 
-public final class GuavaCache extends AbstractPropertyCache {
+public final class GuavaCache extends AbstractPropertyCache<String> {
     private final LoadingCache<PropertyKey, PropertyHolder> propertyCache;
 
     public GuavaCache () {
@@ -20,7 +20,8 @@ public final class GuavaCache extends AbstractPropertyCache {
                                          .build (new PropertyCacheLoader ());
     }
 
-    public PropertyHolder get (final String key) {
-        return propertyCache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));
+    @Override
+    public PropertyHolder get (final String property) {
+        return propertyCache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (property.intern ()));
     }
 }

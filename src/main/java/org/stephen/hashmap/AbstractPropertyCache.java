@@ -2,14 +2,15 @@ package org.stephen.hashmap;
 
 import java.lang.reflect.Method;
 
-public abstract class AbstractPropertyCache implements PropertyCache<AbstractPropertyCache.PropertyHolder> {
+
+public abstract class AbstractPropertyCache<KeyType> implements Cache<AbstractPropertyCache.PropertyHolder, KeyType> {
 
     protected AbstractPropertyCache () {
 
     }
 
     @Override
-    public abstract PropertyHolder get (final String property);
+    public abstract PropertyHolder get (final KeyType key);
 
     public static final class PropertyHolder {
         private final String propertyName;
@@ -102,4 +103,6 @@ public abstract class AbstractPropertyCache implements PropertyCache<AbstractPro
             }
         }
     }
+
 }
+

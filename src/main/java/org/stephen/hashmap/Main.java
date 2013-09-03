@@ -8,23 +8,29 @@ import java.util.concurrent.ExecutionException;
 public final class Main {
 
     public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
-        final GuavaCache cache = new GuavaCache ();
-        List<String> propertyList = getPropertyList ();
+        System.out.println ("Testing Guava Cache");
+        testCache (new GuavaCache ());
+        System.out.println ("Testing LinkedHashMap Cache");
+        testCache (new LinkedHashMapCache ());
+        System.out.println ("Finished!");
+    }
 
+    private static void testCache (final AbstractPropertyCache cache) {
+        List<String> propertyList = getPropertyList ();
+        final String cacheClass = cache.getClass ().getSimpleName ();
         long startTime, endTime;
         for (int i = 0; i < 1001; ++i) {
             for (String property : propertyList) {
                 startTime = System.nanoTime ();
-                cache.get (property);
+                final AbstractPropertyCache.PropertyHolder propertyHolder = cache.get (property);
                 endTime = System.nanoTime () - startTime;
 
                 if (i % 10 == 0) {
                     final String times = String.format ("%01$,.4f ms, %2$,.6f sec", (endTime / 1000000.0), endTime / 1000000000.0);
-                    System.out.println (String.format ("[%03d] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)", i, property, " ", endTime, times));
+                    System.out.println (String.format ("[%03d] [%s] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)", i, cacheClass, property, " ", endTime, times));
                 }
             }
         }
-        System.out.println ("Finished!");
     }
 
     private static List<String> getPropertyList () {
