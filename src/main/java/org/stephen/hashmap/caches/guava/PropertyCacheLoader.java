@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.stephen.hashmap.PropertyDescriptorCache;
 import org.stephen.hashmap.PropertyDescriptorUtils;
 import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.caches.property.PropertyHolderFactory;
 import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
 import java.beans.PropertyDescriptor;
@@ -24,7 +25,7 @@ public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.Pr
         final String propertyKey = key.getKey ();
         final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (util.getPropertyFromKeyString (propertyKey),
                                                                                      util.getClassFromKeyString (propertyKey));
-        return util.createPropertyHolder (descriptor);
+        return PropertyHolderFactory.INSTANCE.create (descriptor);
     }
 
     private PropertyDescriptor getPropertyFromPropertyDescriptorList (final String property, final Class<?> clazz) throws ExecutionException {

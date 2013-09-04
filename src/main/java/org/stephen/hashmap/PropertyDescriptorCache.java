@@ -3,12 +3,12 @@ package org.stephen.hashmap;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.stephen.hashmap.caches.Cache;
+import org.stephen.hashmap.caches.ClassPropertyCache;
 
 import java.beans.PropertyDescriptor;
 import java.util.concurrent.TimeUnit;
 
-public final class PropertyDescriptorCache implements Cache<PropertyDescriptor[], Class<?>> {
+public final class PropertyDescriptorCache implements ClassPropertyCache<Class<?>, PropertyDescriptor[]> {
     private final LoadingCache<Class<?>, PropertyDescriptor[]> propertyDescriptorCache;
     private final PropertyDescriptorUtils util = new PropertyDescriptorUtils ();
 

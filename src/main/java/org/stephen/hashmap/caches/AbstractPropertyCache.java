@@ -3,7 +3,7 @@ package org.stephen.hashmap.caches;
 import org.stephen.hashmap.caches.property.PropertyHolder;
 
 
-public abstract class AbstractPropertyCache<KeyType> implements Cache<PropertyHolder, KeyType> {
+public abstract class AbstractPropertyCache<KeyType> implements ClassPropertyCache<KeyType, PropertyHolder> {
 
     protected AbstractPropertyCache () {
 

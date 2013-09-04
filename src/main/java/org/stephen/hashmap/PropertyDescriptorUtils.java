@@ -12,7 +12,7 @@ public final class PropertyDescriptorUtils {
     private static final String KEY_SPLIT_TOKEN = ".";
 
     public PropertyHolder createPropertyHolder (final PropertyDescriptor propertyDescriptor) {
-        return new PropertyHolder.Builder (propertyDescriptor.getName (), propertyDescriptor.getClass ().getName ())
+        return new PropertyHolder.Builder (propertyDescriptor.getName (), propertyDescriptor.getClass ())
                 .withReadMethod (propertyDescriptor.getReadMethod ())
                 .withWriteMethod (propertyDescriptor.getWriteMethod ())
                 .build ();
