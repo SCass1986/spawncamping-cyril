@@ -18,13 +18,33 @@ public enum ApplicationConfig implements AppConfig {
     }
 
     @Override
+    public String getString (final String property) {
+        return appConfig.getString (property, null);
+    }
+
+    @Override
+    public int getInt (final String property) {
+        return appConfig.getInt (property, null);
+    }
+
+    @Override
+    public double getDouble (final String property) {
+        return appConfig.getDouble (property, null);
+    }
+
+    @Override
+    public boolean getBoolean (final String property) {
+        return appConfig.getBoolean (property, null);
+    }
+
+    @Override
     public String getString (final String property, final String defaultValue) {
         return appConfig.getString (property, defaultValue);
     }
 
     @Override
-    public int getInteger (final String property, final DefaultValue<Integer> defaultValue) {
-        return appConfig.getInteger (property, defaultValue);
+    public int getInt (final String property, final DefaultValue<Integer> defaultValue) {
+        return appConfig.getInt (property, defaultValue);
     }
 
     @Override
@@ -63,12 +83,32 @@ public enum ApplicationConfig implements AppConfig {
         }
 
         @Override
+        public String getString (final String property) {
+            return properties.getString (property);
+        }
+
+        @Override
+        public int getInt (final String property) {
+            return properties.getInt (property);
+        }
+
+        @Override
+        public double getDouble (final String property) {
+            return properties.getDouble (property);
+        }
+
+        @Override
+        public boolean getBoolean (final String property) {
+            return properties.getBoolean (property);
+        }
+
+        @Override
         public String getString (final String property, final String defaultValue) {
             return properties.getString (property, defaultValue);
         }
 
         @Override
-        public int getInteger (final String property, final DefaultValue<Integer> defaultValue) {
+        public int getInt (final String property, final DefaultValue<Integer> defaultValue) {
             return properties.getInt (property, defaultValue.value ());
         }
 

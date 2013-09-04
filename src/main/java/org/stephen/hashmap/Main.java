@@ -28,10 +28,10 @@ public final class Main {
     }
 
     private static GuavaCache getGuavaCache () {
-        final int maxSize = ApplicationConfig.INSTANCE.getInteger (GUAVA_CACHE_MAXSIZE.getKey (),
-                                                                   GUAVA_CACHE_MAXSIZE.getDefault ());
-        final int concurrencyLevel = ApplicationConfig.INSTANCE.getInteger (GUAVA_CONCURRENCY_LEVEL.getKey (),
-                                                                            GUAVA_CONCURRENCY_LEVEL.getDefault ());
+        final int maxSize = ApplicationConfig.INSTANCE.getInt (GUAVA_CACHE_MAXSIZE.getKey (),
+                                                               GUAVA_CACHE_MAXSIZE.getDefault ());
+        final int concurrencyLevel = ApplicationConfig.INSTANCE.getInt (GUAVA_CONCURRENCY_LEVEL.getKey (),
+                                                                        GUAVA_CONCURRENCY_LEVEL.getDefault ());
         System.out.println (String.format ("+------------------------------------+\n" +
                                            "| Guava Cache Parameters:\n" +
                                            "|  Maximum Size       : %s\n" +
