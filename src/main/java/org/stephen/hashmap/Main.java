@@ -5,6 +5,7 @@ import org.stephen.hashmap.caches.guava.GuavaCache;
 import org.stephen.hashmap.caches.lru.LinkedHashMapCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
 import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.config.ApplicationConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -15,11 +16,19 @@ import java.util.concurrent.TimeUnit;
 public final class Main {
 
     public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
+        System.out.println ("Starting!");
+        System.out.println ("Setting up Config...");
+        setUpConfig ();
+        System.out.println ("Setup Config!");
         System.out.println ("Testing Guava ClassPropertyCache");
         testCache (getGuavaCache ());
         System.out.println ("Testing LinkedHashMap ClassPropertyCache");
         testCache (getLinkedHashMapCache ());
         System.out.println ("Finished!");
+    }
+
+    private static void setUpConfig () {
+        final ApplicationConfig instance = ApplicationConfig.INSTANCE;
     }
 
     private static GuavaCache getGuavaCache () {
@@ -46,7 +55,7 @@ public final class Main {
 
         final CacheObject cacheObject = new CacheObject ("stringValue", 134678L, 10.99);
         startTime = System.nanoTime ();
-        for (int i = 0; i < 1001; ++i) {
+        for (int i = 0; i < 0; ++i) {
             for (final String property : propertyList) {
                 iterationStartTime = System.nanoTime ();
                 cache.get (property).getValue (cacheObject);

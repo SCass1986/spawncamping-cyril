@@ -9,28 +9,31 @@ import java.net.URL;
 public enum ApplicationConfig implements AppConfig {
     INSTANCE;
 
-    private final ApplicationConfigManager appConfig = new ApplicationConfigManager ();
+    private final ApplicationConfigManager appConfig;
+
+    private ApplicationConfig () {
+        this.appConfig = new ApplicationConfigManager ();
+    }
 
     @Override
     public String getString (final String property, final String defaultValue) {
-        return null;
+        return appConfig.getString (property, defaultValue);
     }
 
     @Override
     public int getInteger (final String property, final DefaultValue<Integer> defaultValue) {
-        return 0;
+        return appConfig.getInteger (property, defaultValue);
     }
 
     @Override
     public double getDouble (final String property, final DefaultValue<Double> defaultValue) {
-        return 0;
+        return appConfig.getDouble (property, defaultValue);
     }
 
     @Override
     public boolean getBoolean (final String property, final DefaultValue<Boolean> defaultValue) {
-        return false;
+        return appConfig.getBoolean (property, defaultValue);
     }
-
 
     private static final class ApplicationConfigManager implements AppConfig {
         private static final String PROPERTIES_FILE = "/cache.properties";
