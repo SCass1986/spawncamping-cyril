@@ -9,10 +9,12 @@ import java.net.URL;
 public enum ApplicationConfig implements AppConfig {
     INSTANCE;
 
+    private static final String CACHE_PROPERTIES_FILE = "cache.properties";
     private final ApplicationConfigManager appConfig;
 
     private ApplicationConfig () {
         this.appConfig = new ApplicationConfigManager ();
+        this.appConfig.init (getPropertiesConfigFile ());
     }
 
     @Override
@@ -35,12 +37,29 @@ public enum ApplicationConfig implements AppConfig {
         return appConfig.getBoolean (property, defaultValue);
     }
 
+    private URL getPropertiesConfigFile () {
+        return this.getClass ().getClassLoader ().getResource (CACHE_PROPERTIES_FILE);
+    }
+
     private static final class ApplicationConfigManager implements AppConfig {
-        private static final String PROPERTIES_FILE = "/cache.properties";
+
         private final PropertiesConfiguration properties;
 
         public ApplicationConfigManager () {
-            this.properties = createPropertiesConfig ();
+            this.properties = new PropertiesConfiguration ();
+        }
+
+        public boolean init (final URL configFile) {
+            try {
+                synchronized (this) {
+                    properties.load (configFile);
+                    properties.setReloadingStrategy (new FileChangedReloadingStrategy ());
+                }
+            } catch (ConfigurationException e) {
+                e.printStackTrace ();
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -61,18 +80,6 @@ public enum ApplicationConfig implements AppConfig {
         @Override
         public boolean getBoolean (final String property, final DefaultValue<Boolean> defaultValue) {
             return properties.getBoolean (property, defaultValue.value ());
-        }
-
-        private PropertiesConfiguration createPropertiesConfig () {
-            try {
-                final URL propertiesFile = this.getClass ().getClassLoader ().getResource (PROPERTIES_FILE);
-                final PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration (propertiesFile);
-                propertiesConfiguration.setReloadingStrategy (new FileChangedReloadingStrategy ());
-                return propertiesConfiguration;
-            } catch (ConfigurationException e) {
-                e.printStackTrace ();
-                return null;
-            }
         }
     }
 }
