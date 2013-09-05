@@ -2,7 +2,7 @@ package org.stephen.hashmap;
 
 import org.stephen.hashmap.caches.ClassPropertyCache;
 import org.stephen.hashmap.caches.guava.GuavaCache;
-import org.stephen.hashmap.caches.lru.LinkedHashMapCache;
+import org.stephen.hashmap.caches.lru.LeastRecentlyUsedCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
 import org.stephen.hashmap.caches.property.PropertyHolder;
 import org.stephen.hashmap.config.AppConfig;
@@ -17,10 +17,13 @@ public final class Main {
 
     public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
         System.out.println ("Starting!");
+        int testIterations = AppConfig.INSTANCE.getInt ("guava.cache.test.iterations", 0);
         System.out.println ("Testing Guava ClassPropertyCache");
-        testCache (getGuavaCache ());
+        testCache (getGuavaCache (), testIterations);
+
         System.out.println ("Testing LinkedHashMap ClassPropertyCache");
-        testCache (getLinkedHashMapCache ());
+        testIterations = AppConfig.INSTANCE.getInt ("lru.cache.test.iterations", 1001);
+        testCache (getLinkedHashMapCache (), testIterations);
         System.out.println ("Finished!");
     }
 
@@ -44,23 +47,23 @@ public final class Main {
                 .build ();
     }
 
-    private static LinkedHashMapCache getLinkedHashMapCache () {
-        return new LinkedHashMapCache.Builder ()
-                .withInitialCapacity (16)
+    private static LeastRecentlyUsedCache getLinkedHashMapCache () {
+        return new LeastRecentlyUsedCache.Builder ()
+                .withInitialCapacity (32)
                 .withLoadFactor (0.75f)
                 .withAccessOrder (true)
-                .withEvictionStrategy (new EvictBySize (5))
+                .withEvictionStrategy (new EvictBySize (50))
                 .build ();
     }
 
-    private static void testCache (final ClassPropertyCache<String, PropertyHolder> cache) {
+    private static void testCache (final ClassPropertyCache<String, PropertyHolder> cache, final int testIterations) {
         List<String> propertyList = getPropertyList ();
         final String cacheClass = cache.getClass ().getSimpleName ();
         long iterationStartTime, iterationEndTime, startTime, endTime;
 
         final CacheObject cacheObject = new CacheObject ("stringValue", 134678L, 10.99);
         startTime = System.nanoTime ();
-        for (int i = 0; i < 0; ++i) {
+        for (int i = 0; i < testIterations; ++i) {
             for (final String property : propertyList) {
                 iterationStartTime = System.nanoTime ();
                 cache.get (property).getValue (cacheObject);

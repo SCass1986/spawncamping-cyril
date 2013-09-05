@@ -16,11 +16,11 @@ import java.util.Map;
 
 import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
 
-public final class LinkedHashMapCache implements ClassPropertyCache<String, PropertyHolder> {
-    private final HashMapCache cache;
+public final class LeastRecentlyUsedCache implements ClassPropertyCache<String, PropertyHolder> {
+    private final LinkedHashMapCache cache;
 
-    protected LinkedHashMapCache (final Builder builder) {
-        this.cache = new HashMapCache (builder.initialCapactity, builder.loadFactor, builder.accessOrder, builder.evictionStrategy);
+    protected LeastRecentlyUsedCache (final Builder builder) {
+        this.cache = new LinkedHashMapCache (builder.initialCapacity, builder.loadFactor, builder.accessOrder, builder.evictionStrategy);
     }
 
     @Override
@@ -28,12 +28,11 @@ public final class LinkedHashMapCache implements ClassPropertyCache<String, Prop
         return cache.get (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private static final class HashMapCache extends LinkedHashMap<PropertyKey, PropertyHolder> {
+    private static final class LinkedHashMapCache extends LinkedHashMap<PropertyKey, PropertyHolder> {
         private final PropertyDescriptorCache propertyDescriptorCache = new PropertyDescriptorCache ();
-        private final PropertyDescriptorUtils util                    = new PropertyDescriptorUtils ();
         private EvictionStrategy<PropertyKey, PropertyHolder> evictionStrategy;
 
-        public HashMapCache (final int initialCapacity, final float loadFactor, final boolean accessOrder, final EvictionStrategy evictionStrategy) {
+        public LinkedHashMapCache (final int initialCapacity, final float loadFactor, final boolean accessOrder, final EvictionStrategy evictionStrategy) {
             super (initialCapacity, loadFactor, accessOrder);
             setEvictionStrategy (evictionStrategy);
         }
@@ -66,8 +65,8 @@ public final class LinkedHashMapCache implements ClassPropertyCache<String, Prop
 
         private PropertyHolder getPropertyHolder (final PropertyKey key) throws ClassNotFoundException, IntrospectionException {
             final String property = key.getKey ();
-            final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (util.getPropertyFromKeyString (property),
-                                                                                         util.getClassFromKeyString (property));
+            final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (PropertyDescriptorUtils.getPropertyFromKeyString (property),
+                                                                                         PropertyDescriptorUtils.getClassFromKeyString (property));
             return put (key, PropertyHolderFactory.INSTANCE.create (descriptor));
         }
 
@@ -89,7 +88,7 @@ public final class LinkedHashMapCache implements ClassPropertyCache<String, Prop
     }
 
     public static final class Builder {
-        private int              initialCapactity;
+        private int              initialCapacity;
         private float            loadFactor;
         private boolean          accessOrder;
         private EvictionStrategy evictionStrategy;
@@ -98,7 +97,7 @@ public final class LinkedHashMapCache implements ClassPropertyCache<String, Prop
         }
 
         public Builder withInitialCapacity (final int initialCapacity) {
-            this.initialCapactity = initialCapacity;
+            this.initialCapacity = initialCapacity;
             return this;
         }
 
@@ -117,8 +116,8 @@ public final class LinkedHashMapCache implements ClassPropertyCache<String, Prop
             return this;
         }
 
-        public LinkedHashMapCache build () {
-            return new LinkedHashMapCache (this);
+        public LeastRecentlyUsedCache build () {
+            return new LeastRecentlyUsedCache (this);
         }
     }
 }

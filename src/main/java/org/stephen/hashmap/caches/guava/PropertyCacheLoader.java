@@ -6,14 +6,14 @@ import org.stephen.hashmap.PropertyDescriptorCache;
 import org.stephen.hashmap.PropertyDescriptorUtils;
 import org.stephen.hashmap.caches.property.PropertyHolder;
 import org.stephen.hashmap.caches.property.PropertyHolderFactory;
-import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
 import java.beans.PropertyDescriptor;
 import java.util.concurrent.ExecutionException;
 
-public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.PropertyKey, PropertyHolder> {
+import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
+
+public final class PropertyCacheLoader extends CacheLoader<PropertyKey, PropertyHolder> {
     private final PropertyDescriptorCache propertyDescriptorCache;
-    private final PropertyDescriptorUtils util = new PropertyDescriptorUtils ();
 
     public PropertyCacheLoader () {
         super ();
@@ -21,10 +21,10 @@ public final class PropertyCacheLoader extends CacheLoader<PropertyKeyFactory.Pr
     }
 
     @Override
-    public PropertyHolder load (final PropertyKeyFactory.PropertyKey key) throws Exception {
+    public PropertyHolder load (final PropertyKey key) throws Exception {
         final String propertyKey = key.getKey ();
-        final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (util.getPropertyFromKeyString (propertyKey),
-                                                                                     util.getClassFromKeyString (propertyKey));
+        final PropertyDescriptor descriptor = getPropertyFromPropertyDescriptorList (PropertyDescriptorUtils.getPropertyFromKeyString (propertyKey),
+                                                                                     PropertyDescriptorUtils.getClassFromKeyString (propertyKey));
         return PropertyHolderFactory.INSTANCE.create (descriptor);
     }
 
