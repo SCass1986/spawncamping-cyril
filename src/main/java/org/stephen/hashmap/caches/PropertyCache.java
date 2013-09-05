@@ -15,7 +15,7 @@ public class PropertyCache implements ClassUtil {
 
     @Override
     public Object getValue (final Object object, final String property) {
-        final PropertyKey key = PropertyKeyFactory.INSTANCE.getKey (String.format ("%s.%s", object.getClass ().getName (), property));
+        final PropertyKey key = PropertyKeyFactory.INSTANCE.getKey (String.format ("%s.%s", object.getClass ().getName ().intern (), property));
         return cache.get (key).getValue (object);
     }
 }

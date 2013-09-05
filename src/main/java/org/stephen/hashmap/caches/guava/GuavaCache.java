@@ -2,45 +2,67 @@ package org.stephen.hashmap.caches.guava;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Sets;
 import org.stephen.hashmap.caches.ClassPropertyCache;
 import org.stephen.hashmap.caches.property.PropertyHolder;
 import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
 
 
-public final class GuavaCache implements ClassPropertyCache<String, PropertyHolder> {
-    private final LoadingCache<PropertyKey, PropertyHolder> propertyCache;
+public final class GuavaCache implements ClassPropertyCache<PropertyKey, PropertyHolder> {
+    private final LoadingCache<PropertyKey, PropertyHolder> cache;
 
     protected GuavaCache (final Builder builder) {
         super ();
-        this.propertyCache = CacheBuilder.newBuilder ()
-                                         .maximumSize (builder.maximumSize)
-                                         .concurrencyLevel (builder.concurrencyLevel)
-                                         .expireAfterAccess (builder.expireAfterAccessTime, builder.expireAfterAccessTimeUnit)
-                                         .build (new PropertyCacheLoader ());
+        this.cache = CacheBuilder.newBuilder ()
+                                 .maximumSize (builder.maximumSize)
+                                 .concurrencyLevel (builder.concurrencyLevel)
+                                 .expireAfterAccess (builder.expireAfterAccessTime, builder.expireAfterAccessTimeUnit)
+                                 .build (new PropertyCacheLoader ());
+    }
+
+    @Override
+    public PropertyHolder get (final PropertyKey key) {
+        return cache.getUnchecked (key);
     }
 
     @Override
     public PropertyHolder get (final String key) {
-        return propertyCache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));
+        return cache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));
     }
 
     @Override
     public void clearCache () {
-        propertyCache.cleanUp ();
+        cache.cleanUp ();
+    }
+
+    @Override
+    public Set<PropertyHolder> getValues () {
+        return Sets.newHashSet (cache.asMap ().values ());
+    }
+
+    @Override
+    public Set<Map.Entry<PropertyKey, PropertyHolder>> getEntries () {
+        return Sets.newHashSet (cache.asMap ().entrySet ());
     }
 
     public static final class Builder {
-        private final int maximumSize;
-        private int      concurrencyLevel          = 1;
-        private int      expireAfterAccessTime     = 100;
-        private TimeUnit expireAfterAccessTimeUnit = TimeUnit.MINUTES;
+        private int      maximumSize;
+        private int      concurrencyLevel;
+        private int      expireAfterAccessTime;
+        private TimeUnit expireAfterAccessTimeUnit;
 
-        public Builder (final int maximumSize) {
+        public Builder () {
+        }
+
+        public Builder withMaximumSize (final int maximumSize) {
             this.maximumSize = maximumSize;
+            return this;
         }
 
         public Builder withConcurrencyLevel (final int concurrencyLevel) {
@@ -55,6 +77,14 @@ public final class GuavaCache implements ClassPropertyCache<String, PropertyHold
 
         public Builder withExpireAfterAccessTimeUnit (final TimeUnit expireAfterAccessTimeUnit) {
             this.expireAfterAccessTimeUnit = expireAfterAccessTimeUnit;
+            return this;
+        }
+
+        public Builder withDefaults () {
+            this.maximumSize = 32;
+            this.concurrencyLevel = 1;
+            this.expireAfterAccessTime = 10;
+            this.expireAfterAccessTimeUnit = TimeUnit.MINUTES;
             return this;
         }
 
