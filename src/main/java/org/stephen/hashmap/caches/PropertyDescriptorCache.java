@@ -26,6 +26,12 @@ public final class PropertyDescriptorCache implements ClassPropertyCache<Class<?
     }
 
     @Override
+    public PropertyDescriptor[] get (final String key) throws ClassNotFoundException {
+        final Class<?> clazz = PropertyDescriptorUtils.getClassFromKeyString (key);
+        return get (clazz);
+    }
+
+    @Override
     public void clearCache () {
         propertyDescriptorCache.cleanUp ();
     }

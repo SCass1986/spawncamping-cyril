@@ -6,7 +6,7 @@ import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
 
 
-public class PropertyCache implements ClassUtil<PropertyKey, PropertyHolder> {
+public class PropertyCache implements ClassUtil {
     private final ClassPropertyCache<PropertyKey, PropertyHolder> cache;
 
     public PropertyCache (final ClassPropertyCache<PropertyKey, PropertyHolder> cache) {

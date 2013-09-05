@@ -4,10 +4,8 @@ import org.stephen.hashmap.caches.ClassPropertyCache;
 import org.stephen.hashmap.caches.PropertyCache;
 import org.stephen.hashmap.caches.guava.GuavaCache;
 import org.stephen.hashmap.caches.lru.LeastRecentlyUsedCache;
-import org.stephen.hashmap.caches.lru.LinkedHashMapCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
 import org.stephen.hashmap.caches.property.PropertyHolder;
-import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 import org.stephen.hashmap.config.AppConfig;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,22 +14,27 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static org.stephen.hashmap.caches.property.PropertyKeyFactory.PropertyKey;
+
+
 public final class Main {
     public static final boolean LOGGING_ON = false;
 
-    public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
-        System.out.println ("Starting!");
+    public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
+        Logger.info ("Starting!");
         int testIterations = AppConfig.INSTANCE.getInt ("guava.cache.test.iterations", 0);
-        System.out.println ("Testing Guava ClassPropertyCache");
+        Logger.info ("Testing Guava ClassPropertyCache");
         testCache (getGuavaCache (), testIterations);
 
-        System.out.println ("Testing LinkedHashMap ClassPropertyCache");
+        Logger.info ("Testing LinkedHashMap ClassPropertyCache");
         testIterations = AppConfig.INSTANCE.getInt ("lru.cache.test.iterations", 0);
         testCache (getLinkedHashMapCache (), testIterations);
 
-        System.out.println ("Testing ClassUtilCache with LinkedHashMap");
-        testCache (getPropertyCache (new LinkedHashMapCache (100, 0.75f, true, new EvictBySize (15))), 1001);
-        System.out.println ("Finished!");
+        Logger.info ("Testing ClassUtilCache with LinkedHashMap");
+        testCache (getPropertyCache (new LeastRecentlyUsedCache.Builder ()
+                                             .withDefaults ()
+                                             .build ()), 1001);
+        Logger.info ("Finished!");
     }
 
     private static void testCache (final PropertyCache cache, final int testIterations) {
@@ -56,10 +59,10 @@ public final class Main {
             }
         }
         endTime = System.nanoTime () - startTime;
-        System.out.println (String.format ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime)));
+        Logger.info ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime));
     }
 
-    private static void testCache (final ClassPropertyCache<String, PropertyHolder> cache, final int testIterations) {
+    private static void testCache (final ClassPropertyCache<PropertyKey, PropertyHolder> cache, final int testIterations) throws ClassNotFoundException {
         List<String> propertyList = getPropertyList ();
         final String cacheClass = cache.getClass ().getSimpleName ();
         long iterationStartTime, iterationEndTime, startTime, endTime;
@@ -84,11 +87,11 @@ public final class Main {
         System.out.println (String.format ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime)));
     }
 
-    private static PropertyCache getPropertyCache (final ClassPropertyCache<PropertyKeyFactory.PropertyKey, PropertyHolder> cache) {
+    private static PropertyCache getPropertyCache (final ClassPropertyCache<PropertyKey, PropertyHolder> cache) {
         return new PropertyCache (cache);
     }
 
-    private static LeastRecentlyUsedCache getLinkedHashMapCache () {
+    private static ClassPropertyCache getLinkedHashMapCache () {
         return new LeastRecentlyUsedCache.Builder ()
                 .withInitialCapacity (32)
                 .withLoadFactor (0.75f)
@@ -97,7 +100,7 @@ public final class Main {
                 .build ();
     }
 
-    private static GuavaCache getGuavaCache () {
+    private static ClassPropertyCache getGuavaCache () {
         final int maxSize = AppConfig.INSTANCE.getInt ("guava.cache.max_size", 100);
         final int concurrencyLevel = AppConfig.INSTANCE.getInt ("guava.cache.concurrency_level", 1);
         final int expireTime = AppConfig.INSTANCE.getInt ("guava.cache.expire_after_access_time", 100);
