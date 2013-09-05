@@ -5,16 +5,13 @@ import org.stephen.hashmap.caches.guava.GuavaCache;
 import org.stephen.hashmap.caches.lru.LinkedHashMapCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
 import org.stephen.hashmap.caches.property.PropertyHolder;
-import org.stephen.hashmap.config.ApplicationConfig;
+import org.stephen.hashmap.config.AppConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static org.stephen.hashmap.config.ConfigProperties.GUAVA_CACHE_MAXSIZE;
-import static org.stephen.hashmap.config.ConfigProperties.GUAVA_CONCURRENCY_LEVEL;
 
 public final class Main {
 
@@ -28,16 +25,18 @@ public final class Main {
     }
 
     private static GuavaCache getGuavaCache () {
-        final int maxSize = ApplicationConfig.INSTANCE.getInt (GUAVA_CACHE_MAXSIZE.getKey (),
-                                                               GUAVA_CACHE_MAXSIZE.getDefault ());
-        final int concurrencyLevel = ApplicationConfig.INSTANCE.getInt (GUAVA_CONCURRENCY_LEVEL.getKey (),
-                                                                        GUAVA_CONCURRENCY_LEVEL.getDefault ());
+        final int maxSize = AppConfig.INSTANCE.getInt ("guava.cache.max_size", 100);
+        final int concurrencyLevel = AppConfig.INSTANCE.getInt ("guava.cache.concurrency_level", 1);
+        final int expireTime = AppConfig.INSTANCE.getInt ("guava.cache.expire_after_access_time", 100);
+        final TimeUnit timeUnit = TimeUnit.valueOf (AppConfig.INSTANCE.getString ("guava.cache.expire_after_access_time_unit", "SECONDS"));
+
         System.out.println (String.format ("+------------------------------------+\n" +
                                            "| Guava Cache Parameters:\n" +
-                                           "|  Maximum Size       : %s\n" +
-                                           "|  Concurrency Level  : %s\n" +
+                                           "|  Maximum Size             : %s\n" +
+                                           "|  Concurrency Level        : %s\n" +
+                                           "|  Expire After Access Time : %s %s\n" +
                                            "+------------------------------------+",
-                                           maxSize, concurrencyLevel));
+                                           maxSize, concurrencyLevel, expireTime, timeUnit));
         return new GuavaCache.Builder (maxSize)
                 .withConcurrencyLevel (concurrencyLevel)
                 .withExpireAfterAccessTime (100)

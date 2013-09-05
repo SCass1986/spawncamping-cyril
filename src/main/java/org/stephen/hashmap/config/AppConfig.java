@@ -1,20 +1,66 @@
 package org.stephen.hashmap.config;
 
-public interface AppConfig {
-    String getString (final String property);
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 
-    String getString (final String property, final String defaultValue);
+public enum AppConfig implements ApplicationConfiguration {
+    INSTANCE;
 
-    int getInt (final String property);
+    private AppConfig () {
+    }
 
-    int getInt (final String property, final DefaultValue<Integer> defaultValue);
+    @Override
+    public String getString (final String property) {
+        return Properties.properties.getString (property, null);
+    }
 
-    double getDouble (final String property);
+    @Override
+    public int getInt (final String property) {
+        return Properties.properties.getInt (property);
+    }
 
-    double getDouble (final String property, final DefaultValue<Double> defaultValue);
+    @Override
+    public double getDouble (final String property) {
+        return Properties.properties.getDouble (property);
+    }
 
-    boolean getBoolean (final String property);
+    @Override
+    public boolean getBoolean (final String property) {
+        return Properties.properties.getBoolean (property);
+    }
 
-    boolean getBoolean (final String property, final DefaultValue<Boolean> defaultValue);
+    @Override
+    public String getString (final String property, final String defaultValue) {
+        return Properties.properties.getString (property, defaultValue);
+    }
+
+    @Override
+    public int getInt (final String property, final int defaultValue) {
+        return Properties.properties.getInt (property, defaultValue);
+    }
+
+    @Override
+    public double getDouble (final String property, final double defaultValue) {
+        return Properties.properties.getDouble (property, defaultValue);
+    }
+
+    @Override
+    public boolean getBoolean (final String property, final boolean defaultValue) {
+        return Properties.properties.getBoolean (property, defaultValue);
+    }
+
+    private static final class Properties {
+        private static final   String                  CACHE_PROPERTIES_FILE = "cache.properties";
+        protected static final PropertiesConfiguration properties            = new PropertiesConfiguration ();
+
+        static {
+            try {
+                properties.load (CACHE_PROPERTIES_FILE);
+                properties.setReloadingStrategy (new FileChangedReloadingStrategy ());
+            } catch (ConfigurationException e) {
+                e.printStackTrace ();
+            }
+        }
+    }
 }
-
