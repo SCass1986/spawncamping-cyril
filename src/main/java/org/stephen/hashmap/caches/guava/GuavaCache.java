@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 import org.stephen.hashmap.caches.ClassPropertyCache;
+import org.stephen.hashmap.caches.PropertyCacheBuilder;
 import org.stephen.hashmap.caches.property.PropertyHolder;
 import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 
@@ -51,7 +52,7 @@ public final class GuavaCache implements ClassPropertyCache<PropertyKey, Propert
         return Sets.newHashSet (cache.asMap ().entrySet ());
     }
 
-    public static final class Builder {
+    public static final class Builder implements PropertyCacheBuilder<GuavaCache> {
         private int      maximumSize;
         private int      concurrencyLevel;
         private int      expireAfterAccessTime;
@@ -80,6 +81,7 @@ public final class GuavaCache implements ClassPropertyCache<PropertyKey, Propert
             return this;
         }
 
+        @Override
         public Builder withDefaults () {
             this.maximumSize = 32;
             this.concurrencyLevel = 1;
@@ -88,6 +90,7 @@ public final class GuavaCache implements ClassPropertyCache<PropertyKey, Propert
             return this;
         }
 
+        @Override
         public GuavaCache build () {
             return new GuavaCache (this);
         }

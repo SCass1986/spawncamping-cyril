@@ -1,7 +1,7 @@
 package org.stephen.hashmap;
 
 import org.stephen.hashmap.caches.ClassPropertyCache;
-import org.stephen.hashmap.caches.PropertyCache;
+import org.stephen.hashmap.caches.ClassPropertyUtil;
 import org.stephen.hashmap.caches.guava.GuavaCache;
 import org.stephen.hashmap.caches.lru.LeastRecentlyUsedCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
@@ -45,33 +45,6 @@ public final class Main {
         Logger.info ("Finished!");
     }
 
-    private static void testCache (final PropertyCache cache, final int testIterations) {
-        List<String> propertyList = getPropertyList ();
-        final String cacheClass = cache.getClass ().getSimpleName ();
-        long iterationStartTime, iterationEndTime, startTime, endTime;
-
-        final CacheObject cacheObject = new CacheObject ("stringValue", 134678L, 10.99);
-        startTime = System.nanoTime ();
-        for (int i = 0; i < testIterations; ++i) {
-            for (final String property : propertyList) {
-                iterationStartTime = System.nanoTime ();
-                cache.getValue (cacheObject, PropertyDescriptorUtils.getPropertyFromKeyString (property));
-                iterationEndTime = System.nanoTime ();
-
-                if (LOGGING_VERBOSE_ON) {
-                    if (i % 50 == 0) {
-                        final long timeForIteration = iterationEndTime - iterationStartTime;
-                        final String times = getTimeString (timeForIteration);
-                        Logger.verbose ("[%05d] [%s] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)",
-                                        i, cacheClass, property, " ", iterationEndTime - iterationStartTime, times);
-                    }
-                }
-            }
-        }
-        endTime = System.nanoTime () - startTime;
-        Logger.info ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime));
-    }
-
     private static void testCache (final ClassPropertyCache<PropertyKey, PropertyHolder> cache, final int testIterations) throws ClassNotFoundException {
         List<String> propertyList = getPropertyList ();
         final String cacheClass = cache.getClass ().getSimpleName ();
@@ -99,8 +72,8 @@ public final class Main {
         Logger.info ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime));
     }
 
-    private static PropertyCache getPropertyCache (final ClassPropertyCache<PropertyKey, PropertyHolder> cache) {
-        return new PropertyCache (cache);
+    private static ClassPropertyUtil getPropertyCache (final ClassPropertyCache<PropertyKey, PropertyHolder> cache) {
+        return new ClassPropertyUtil (cache);
     }
 
     private static ClassPropertyCache getLinkedHashMapCache () {
@@ -108,7 +81,7 @@ public final class Main {
                 .withInitialCapacity (32)
                 .withLoadFactor (0.75f)
                 .withAccessOrder (true)
-                .withEvictionStrategy (new EvictBySize (50))
+                .withEvictionStrategy (new EvictBySize (32))
                 .build ();
     }
 

@@ -6,6 +6,7 @@ import org.stephen.hashmap.Logger;
 import org.stephen.hashmap.Main;
 import org.stephen.hashmap.PropertyDescriptorUtils;
 import org.stephen.hashmap.caches.ClassPropertyCache;
+import org.stephen.hashmap.caches.PropertyCacheBuilder;
 import org.stephen.hashmap.caches.PropertyDescriptorCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
 import org.stephen.hashmap.caches.lru.eviction.EvictionStrategy;
@@ -53,7 +54,6 @@ public final class LeastRecentlyUsedCache implements ClassPropertyCache<Property
     public Set<Map.Entry<PropertyKeyFactory.PropertyKey, PropertyHolder>> getEntries () {
         return Sets.newHashSet (cache.entrySet ());
     }
-
 
     private static final class LinkedHashMapCache extends LinkedHashMap<PropertyKeyFactory.PropertyKey, PropertyHolder> {
         private final PropertyDescriptorCache propertyDescriptorCache = new PropertyDescriptorCache ();
@@ -124,8 +124,7 @@ public final class LeastRecentlyUsedCache implements ClassPropertyCache<Property
         }
     }
 
-
-    public static final class Builder {
+    public static final class Builder implements PropertyCacheBuilder<LeastRecentlyUsedCache> {
         private int              initialCapacity;
         private float            loadFactor;
         private boolean          accessOrder;
@@ -154,6 +153,7 @@ public final class LeastRecentlyUsedCache implements ClassPropertyCache<Property
             return this;
         }
 
+        @Override
         public Builder withDefaults () {
             this.initialCapacity = INITIAL_CAPACITY;
             this.loadFactor = LOAD_FACTOR;
@@ -162,6 +162,7 @@ public final class LeastRecentlyUsedCache implements ClassPropertyCache<Property
             return this;
         }
 
+        @Override
         public LeastRecentlyUsedCache build () {
             return new LeastRecentlyUsedCache (this);
         }
