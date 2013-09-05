@@ -1,10 +1,13 @@
 package org.stephen.hashmap;
 
 import org.stephen.hashmap.caches.ClassPropertyCache;
+import org.stephen.hashmap.caches.PropertyCache;
 import org.stephen.hashmap.caches.guava.GuavaCache;
 import org.stephen.hashmap.caches.lru.LeastRecentlyUsedCache;
+import org.stephen.hashmap.caches.lru.LinkedHashMapCache;
 import org.stephen.hashmap.caches.lru.eviction.EvictBySize;
 import org.stephen.hashmap.caches.property.PropertyHolder;
+import org.stephen.hashmap.caches.property.PropertyKeyFactory;
 import org.stephen.hashmap.config.AppConfig;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public final class Main {
+    public static final boolean LOGGING_ON = false;
 
     public static void main (String[] args) throws ExecutionException, InvocationTargetException, IllegalAccessException {
         System.out.println ("Starting!");
@@ -22,9 +26,75 @@ public final class Main {
         testCache (getGuavaCache (), testIterations);
 
         System.out.println ("Testing LinkedHashMap ClassPropertyCache");
-        testIterations = AppConfig.INSTANCE.getInt ("lru.cache.test.iterations", 1001);
+        testIterations = AppConfig.INSTANCE.getInt ("lru.cache.test.iterations", 0);
         testCache (getLinkedHashMapCache (), testIterations);
+
+        System.out.println ("Testing ClassUtilCache with LinkedHashMap");
+        testCache (getPropertyCache (new LinkedHashMapCache (100, 0.75f, true, new EvictBySize (15))), 1001);
         System.out.println ("Finished!");
+    }
+
+    private static void testCache (final PropertyCache cache, final int testIterations) {
+        List<String> propertyList = getPropertyList ();
+        final String cacheClass = cache.getClass ().getSimpleName ();
+        long iterationStartTime, iterationEndTime, startTime, endTime;
+
+        final CacheObject cacheObject = new CacheObject ("stringValue", 134678L, 10.99);
+        startTime = System.nanoTime ();
+        for (int i = 0; i < testIterations; ++i) {
+            for (final String property : propertyList) {
+                iterationStartTime = System.nanoTime ();
+                cache.getValue (cacheObject, PropertyDescriptorUtils.getPropertyFromKeyString (property));
+                iterationEndTime = System.nanoTime ();
+
+                if (i % 50 == 0) {
+                    final long timeForIteration = iterationEndTime - iterationStartTime;
+                    final String times = getTimeString (timeForIteration);
+                    Logger.info ("[%05d] [%s] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)",
+                                 i, cacheClass, property, " ", iterationEndTime - iterationStartTime, times);
+                }
+            }
+        }
+        endTime = System.nanoTime () - startTime;
+        System.out.println (String.format ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime)));
+    }
+
+    private static void testCache (final ClassPropertyCache<String, PropertyHolder> cache, final int testIterations) {
+        List<String> propertyList = getPropertyList ();
+        final String cacheClass = cache.getClass ().getSimpleName ();
+        long iterationStartTime, iterationEndTime, startTime, endTime;
+
+        final CacheObject cacheObject = new CacheObject ("stringValue", 134678L, 10.99);
+        startTime = System.nanoTime ();
+        for (int i = 0; i < testIterations; ++i) {
+            for (final String property : propertyList) {
+                iterationStartTime = System.nanoTime ();
+                cache.get (property).getValue (cacheObject);
+//                cache.get (property).setValue (cacheObject, null);
+                iterationEndTime = System.nanoTime ();
+
+                if (i % 50 == 0) {
+                    final String times = getTimeString (iterationEndTime - iterationStartTime);
+                    Logger.info ("[%05d] [%s] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)",
+                                 i, cacheClass, property, " ", iterationEndTime - iterationStartTime, times);
+                }
+            }
+        }
+        endTime = System.nanoTime () - startTime;
+        System.out.println (String.format ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime)));
+    }
+
+    private static PropertyCache getPropertyCache (final ClassPropertyCache<PropertyKeyFactory.PropertyKey, PropertyHolder> cache) {
+        return new PropertyCache (cache);
+    }
+
+    private static LeastRecentlyUsedCache getLinkedHashMapCache () {
+        return new LeastRecentlyUsedCache.Builder ()
+                .withInitialCapacity (32)
+                .withLoadFactor (0.75f)
+                .withAccessOrder (true)
+                .withEvictionStrategy (new EvictBySize (50))
+                .build ();
     }
 
     private static GuavaCache getGuavaCache () {
@@ -45,38 +115,6 @@ public final class Main {
                 .withExpireAfterAccessTime (100)
                 .withExpireAfterAccessTimeUnit (TimeUnit.SECONDS)
                 .build ();
-    }
-
-    private static LeastRecentlyUsedCache getLinkedHashMapCache () {
-        return new LeastRecentlyUsedCache.Builder ()
-                .withInitialCapacity (32)
-                .withLoadFactor (0.75f)
-                .withAccessOrder (true)
-                .withEvictionStrategy (new EvictBySize (50))
-                .build ();
-    }
-
-    private static void testCache (final ClassPropertyCache<String, PropertyHolder> cache, final int testIterations) {
-        List<String> propertyList = getPropertyList ();
-        final String cacheClass = cache.getClass ().getSimpleName ();
-        long iterationStartTime, iterationEndTime, startTime, endTime;
-
-        final CacheObject cacheObject = new CacheObject ("stringValue", 134678L, 10.99);
-        startTime = System.nanoTime ();
-        for (int i = 0; i < testIterations; ++i) {
-            for (final String property : propertyList) {
-                iterationStartTime = System.nanoTime ();
-                cache.get (property).getValue (cacheObject);
-                iterationEndTime = System.nanoTime () - iterationStartTime;
-
-                if (i % 50 == 0) {
-                    final String times = getTimeString (iterationEndTime);
-                    System.out.println (String.format ("[%03d] [%s] Time to retrieve property <%s>%-" + (50 - property.length ()) + "s: %010d ns (%s)", i, cacheClass, property, " ", iterationEndTime, times));
-                }
-            }
-        }
-        endTime = System.nanoTime () - startTime;
-        System.out.println (String.format ("[%s] Total Time : %010d ns (%s)", cacheClass, endTime, getTimeString (endTime)));
     }
 
     private static String getTimeString (final long time) {

@@ -28,6 +28,11 @@ public final class GuavaCache implements ClassPropertyCache<String, PropertyHold
         return propertyCache.getUnchecked (PropertyKeyFactory.INSTANCE.getKey (key.intern ()));
     }
 
+    @Override
+    public void clearCache () {
+        propertyCache.cleanUp ();
+    }
+
     public static final class Builder {
         private final int maximumSize;
         private int      concurrencyLevel          = 1;

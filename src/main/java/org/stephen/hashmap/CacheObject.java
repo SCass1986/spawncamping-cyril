@@ -1,20 +1,20 @@
 package org.stephen.hashmap;
 
 public final class CacheObject {
-    private final String stringValue_01;
-    private final String stringValue_02;
-    private final String stringValue_03;
-    private final String stringValue_04;
+    private String stringValue_01;
+    private String stringValue_02;
+    private String stringValue_03;
+    private String stringValue_04;
 
-    private final long longValue_01;
-    private final long longValue_02;
-    private final long longValue_03;
-    private final long longValue_04;
+    private long longValue_01;
+    private long longValue_02;
+    private long longValue_03;
+    private long longValue_04;
 
-    private final double doubleValue_01;
-    private final double doubleValue_02;
-    private final double doubleValue_03;
-    private final double doubleValue_04;
+    private double doubleValue_01;
+    private double doubleValue_02;
+    private double doubleValue_03;
+    private double doubleValue_04;
 
     private final int hashCode;
 
@@ -71,6 +71,54 @@ public final class CacheObject {
 
     public double getDoubleValue_04 () {
         return doubleValue_04;
+    }
+
+    public void setStringValue_01 (final String stringValue_01) {
+        this.stringValue_01 = stringValue_01;
+    }
+
+    public void setStringValue_02 (final String stringValue_02) {
+        this.stringValue_02 = stringValue_02;
+    }
+
+    public void setStringValue_03 (final String stringValue_03) {
+        this.stringValue_03 = stringValue_03;
+    }
+
+    public void setStringValue_04 (final String stringValue_04) {
+        this.stringValue_04 = stringValue_04;
+    }
+
+    public void setLongValue_01 (final long longValue_01) {
+        this.longValue_01 = longValue_01;
+    }
+
+    public void setLongValue_02 (final long longValue_02) {
+        this.longValue_02 = longValue_02;
+    }
+
+    public void setLongValue_03 (final long longValue_03) {
+        this.longValue_03 = longValue_03;
+    }
+
+    public void setLongValue_04 (final long longValue_04) {
+        this.longValue_04 = longValue_04;
+    }
+
+    public void setDoubleValue_01 (final double doubleValue_01) {
+        this.doubleValue_01 = doubleValue_01;
+    }
+
+    public void setDoubleValue_02 (final double doubleValue_02) {
+        this.doubleValue_02 = doubleValue_02;
+    }
+
+    public void setDoubleValue_03 (final double doubleValue_03) {
+        this.doubleValue_03 = doubleValue_03;
+    }
+
+    public void setDoubleValue_04 (final double doubleValue_04) {
+        this.doubleValue_04 = doubleValue_04;
     }
 
     @Override
